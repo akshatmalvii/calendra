@@ -12,7 +12,6 @@ export default async function MainLayout({
   return (
     <main className="relative">
       {/* Render PrivateNavBar if user exists, otherwise PublicNavBar */}
-
       {user ? <PrivateNavBar /> : <PublicNavBar />}
 
       {/* Render the children */}

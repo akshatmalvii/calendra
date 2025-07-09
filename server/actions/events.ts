@@ -132,17 +132,17 @@ export async function getEvents(clerkUserId: string): Promise<EventRow[]> {
 }
 
 // Fetch a specific event for a given user
-export async function getEvent(
-  userId: string,
-  eventId: string
-): Promise<EventRow | undefined> {
-  const event = await db.query.EventTable.findFirst({
-    where: ({ id, clerkUserId }, { and, eq }) =>
-      and(eq(clerkUserId, userId), eq(id, eventId)), // Make sure the event belongs to the user
-  });
+// export async function getEvent(
+//   userId: string,
+//   eventId: string
+// ): Promise<EventRow | undefined> {
+//   const event = await db.query.EventTable.findFirst({
+//     where: ({ id, clerkUserId }, { and, eq }) =>
+//       and(eq(clerkUserId, userId), eq(id, eventId)), // Make sure the event belongs to the user
+//   });
 
-  return event ?? undefined; // Explicitly return undefined if not found
-}
+//   return event ?? undefined; // Explicitly return undefined if not found
+// }
 
 // Define a new type for public events, which are always active
 // It removes the generic 'isActive' field and replaces it with a literal true
@@ -165,4 +165,70 @@ export async function getPublicEvents(
 
   // Cast the result to the PublicEvent[] type to indicate all are active
   return events as PublicEvent[];
+}
+
+
+
+// /**
+//  * Fetches a single event by ID for a specific user
+//  * @param clerkUserId - The Clerk user ID associated with the event
+//  * @param eventId - The ID of the event to fetch
+//  * @returns The event if found, otherwise undefined
+//  * @throws Error if database query fails or parameters are invalid
+//  */
+// export async function getEvent(
+//   clerkUserId: string,
+//   eventId: string
+// ): Promise<EventRow | undefined> {
+//   // Convert to string in case they come as numbers or other types
+//   clerkUserId = String(clerkUserId || "");
+//   eventId = "8b2e441d-e80f-4737-9394-bbf90a954cd6"
+
+//   if (!clerkUserId.trim() || !eventId.trim()) {
+//     console.error("Invalid parameters:", {
+//       clerkUserId,
+//       eventId,
+//       stack: new Error().stack, // This will show where the call came from
+//     });
+//     return undefined; // Instead of throwing, return undefined
+//   }
+
+//   try {
+//     const event = await db.query.EventTable.findFirst({
+//       where: (table, { and, eq }) =>
+//         and(eq(table.clerkUserId, clerkUserId), eq(table.id, eventId)),
+//     });
+//     return event ?? undefined;
+//   } catch (error) {
+//     console.error("Database error:", error);
+//     return undefined;
+//   }
+// }
+
+// server/actions/events.ts
+export async function getEvent(clerkUserId: string, eventId: string): Promise<EventRow | undefined> {
+  // No hardcoding needed - just proper validation
+  const clerkUserIdStr = String(clerkUserId || '').trim();
+  const eventIdStr = String(eventId || '').trim();
+
+  if (!clerkUserIdStr || !eventIdStr) {
+    console.error('Validation failed - missing IDs:', {
+      clerkUserId: clerkUserIdStr,
+      eventId: eventIdStr
+    });
+    return undefined;
+  }
+
+  try {
+    const event = await db.query.EventTable.findFirst({
+      where: (table, { and, eq }) => and(
+        eq(table.clerkUserId, clerkUserIdStr),
+        eq(table.id, eventIdStr)
+      ),
+    });
+    return event ?? undefined;
+  } catch (error) {
+    console.error('DB query failed:', error);
+    return undefined;
+  }
 }

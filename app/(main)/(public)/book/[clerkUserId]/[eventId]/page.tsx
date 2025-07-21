@@ -1,3 +1,5 @@
+
+
 import { getEvent } from "@/server/actions/events";
 import { AlertTriangle } from "lucide-react";
 import {
@@ -18,7 +20,7 @@ import {
 import { clerkClient } from "@clerk/nextjs/server";
 import MeetingForm from "@/components/forms/MeetingForm";
 
-
+export const dynamicParams = false;
 
 export default async function BookingPage({
   params,

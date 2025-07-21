@@ -1,5 +1,3 @@
-
-
 import { getEvent } from "@/server/actions/events";
 import { AlertTriangle } from "lucide-react";
 import {
@@ -25,13 +23,16 @@ export const dynamicParams = false;
 export default async function BookingPage({
   params,
 }: {
-  params: { clerkUserId: string; eventId: string };
+  params: Promise<{ clerkUserId: string; eventId: string }>;
 }) {
+  // Await the params since they're now a Promise in Next.js 15
+  const resolvedParams = await params;
+
   // Debug first to see what's actually coming in
-  console.log("Received params:", JSON.stringify(params, null, 2));
+  console.log("Received params:", JSON.stringify(resolvedParams, null, 2));
 
   // Now safely destructure with defaults
-  const { clerkUserId = "", eventId = "" } = params;
+  const { clerkUserId = "", eventId = "" } = resolvedParams;
 
   // Validate parameters
   if (!clerkUserId || !eventId) {
